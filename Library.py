@@ -2,13 +2,13 @@ from pubnub.callbacks import SubscribeCallback
 from pubnub.enums import PNStatusCategory
 from pubnub.pnconfiguration import PNConfiguration
 from pubnub.pubnub import PubNub
- 
+from keychain import keychain
 pnconfig = PNConfiguration()
 
 
 # Networking setings
-pnconfig.subscribe_key = 'sub-c-2b45be56-316e-11e8-aaf1-0a34c056106f'
-pnconfig.publish_key = 'pub-c-ffe97a87-aa34-43bd-98d9-b977d8a65148'
+pnconfig.subscribe_key = keychain.pn_subscribe_key
+pnconfig.publish_key = keychain.pn_publish_key
 
 serverChannel = "TestChannel"
 localId = "client"
