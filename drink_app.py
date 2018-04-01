@@ -2,7 +2,7 @@ from tkinter import ttk
 from tkinter import *
 import tkinter as tk
 
-class recipe:
+class Recipe:
     def __init__(self, recipe_name, option_one, option_two, option_three=None, option_four=None):
         options = [option_one, option_two, option_three, option_four]
         self.recipe_name = recipe_name
@@ -18,12 +18,13 @@ class State:
         "slot_one": "Vodka",
         "slot_two": "Cherry Flavor",
         "slot_three": "Sprite",
-        "slot_four": None,
+        "slot_four": "Bleach",
         }
     recipes = {
-        "Oooorange Boogie": recipe("Oooorange Boogie",("Cherry Flavor",1),("Sprite",1)),
-        "Russain Mechanic": recipe("Russain Mechanic",("Vodka",1),("Elbow Grease",1)),
-        "White death": recipe("White death",("Vodka",1),("Bleach",1))
+        "Russain Mechanic": Recipe("Russain Mechanic",("Vodka",5),("Elbow Grease",5)),
+        "White death": Recipe("White death",("Vodka",5),("Bleach",5)),
+        "The oof ouch": Recipe("The oof ouch",("Sprite",5),("Bleach",5)),
+        "Oooorange Boogie": Recipe("Oooorange Boogie",("Cherry Flavor",5),("Sprite",5))
         }
     possible_drinks = ["Orange Juice", "Vodka"]
     def set_inventory(slot_name, new_value):
@@ -91,11 +92,11 @@ class DrinkApp():
         self.home_drink_select_frame.grid(row=1)
         
         # Setup drink select
-        self.home_drink_options = ["Wow", "some good drinks here", "this one looks pretty good huh?", "nice"]
+        self.home_drink_options = ["Choose a drink"]
         self.home_drink_selected = tk.StringVar(self.home_drink_select_frame)
-        self.home_drink_selected.set(self.home_drink_options[0])
+        self.home_drink_selected.set("Select a drink")
         
-        self.home_drink_select = tk.OptionMenu(self.home_drink_select_frame, self.home_drink_selected, *self.home_drink_options)
+        self.home_drink_select = tk.OptionMenu(self.home_drink_select_frame, self.home_drink_selected, "select a value")
         self.home_drink_select.pack()
         
         # Setup drink slider frame
@@ -103,13 +104,13 @@ class DrinkApp():
         self.home_drink_slider_frame.grid(row=2)
         
         # Setup drink sliders
-        self.home_slider_one = Scale(self.home_drink_slider_frame, from_=0, to=100, orient=HORIZONTAL)
+        self.home_slider_one = Scale(self.home_drink_slider_frame, from_=0, to=10, orient=HORIZONTAL)
         self.home_slider_one.pack()
-        self.home_slider_two = Scale(self.home_drink_slider_frame, from_=0, to=100, orient=HORIZONTAL)
+        self.home_slider_two = Scale(self.home_drink_slider_frame, from_=0, to=10, orient=HORIZONTAL)
         self.home_slider_two.pack()
-        self.home_slider_three = Scale(self.home_drink_slider_frame, from_=0, to=100, orient=HORIZONTAL)
+        self.home_slider_three = Scale(self.home_drink_slider_frame, from_=0, to=10, orient=HORIZONTAL)
         self.home_slider_three.pack()
-        self.home_slider_four = Scale(self.home_drink_slider_frame, from_=0, to=100, orient=HORIZONTAL)
+        self.home_slider_four = Scale(self.home_drink_slider_frame, from_=0, to=10, orient=HORIZONTAL)
         self.home_slider_four.pack()
         
         # Setup start frame
@@ -128,8 +129,10 @@ class DrinkApp():
         # Start main loop
         self.full_update()
         self.root.mainloop()
+
     def full_update(self):
         avalible_ingrediants = []
+        # Remove buttons/slders to start with
         self.home_drink_one.pack_forget()
         self.home_drink_two.pack_forget()
         self.home_drink_three.pack_forget()
@@ -138,6 +141,7 @@ class DrinkApp():
         self.home_slider_two.pack_forget()
         self.home_slider_three.pack_forget()
         self.home_slider_four.pack_forget()
+        # Update and re-add buttons/slders if necessary 
         if (State.inventory["slot_one"] != None):
             self.home_drink_one.config(text=("Slot #1: "+State.inventory["slot_one"]))
             self.home_drink_one.pack()
@@ -158,6 +162,7 @@ class DrinkApp():
             self.home_drink_four.pack()
             self.home_slider_four.pack()
             avalible_ingrediants.append(State.inventory["slot_four"])
+        # Figure out which recipies are currently avalible
         self.home_drink_options = []
         for recipe in State.recipes:
             avalible = True
@@ -167,9 +172,42 @@ class DrinkApp():
                         avalible = False
             if (avalible == True):
                 self.home_drink_options.append(State.recipes[recipe].recipe_name);
-        #self.home_drink_selected.set(self.home_drink_options[0])
-        print(self.home_drink_options);
+        self.home_drink_selected.set("Select a drink")
+        # Clear dropdown values
+        self.home_drink_select["menu"].delete(0, 'end')
+        # Add new values that call set selection
+        for name in self.home_drink_options:
+            self.home_drink_select["menu"].add_command(label=name, command = lambda name = name: self.set_selection(name))
+    def set_selection(self, value):
+        # Update what the dropdown shows
+        self.home_drink_selected.set(value)
+        recipe_value = State.recipes[value]
+        # Update slider amounts
+        self.home_slider_one.set(0)
+        self.home_slider_two.set(0)
+        self.home_slider_three.set(0)
+        self.home_slider_four.set(0)
+        if (State.inventory["slot_one"] in recipe_value.ingredients):
+            self.home_slider_one.set(recipe_value.ingredients[State.inventory["slot_one"]])
+        if (State.inventory["slot_two"] in recipe_value.ingredients):
+            self.home_slider_two.set(recipe_value.ingredients[State.inventory["slot_two"]])
+        if (State.inventory["slot_three"] in recipe_value.ingredients):
+            self.home_slider_three.set(recipe_value.ingredients[State.inventory["slot_three"]])
+        if (State.inventory["slot_four"] in recipe_value.ingredients):
+            self.home_slider_four.set(recipe_value.ingredients[State.inventory["slot_four"]])
+
     def start_activated(self):
+        # Create a new recipe object and send it too the server
+        send_ingredients = []
+        if (State.inventory["slot_one"] != None) and (self.home_slider_one.get() > 0):
+            send_ingredients.append(State.inventory["slot_one"], self.home_slider_one.get())
+        if (State.inventory["slot_two"] != None) and (self.home_slider_two.get() > 0):
+            send_ingredients.append(State.inventory["slot_two"], self.home_slider_two.get())
+        if (State.inventory["slot_three"] != None) and (self.home_slider_three.get() > 0):
+            send_ingredients.append(State.inventory["slot_three"], self.home_slider_three.get())
+        if (State.inventory["slot_four"] != None) and (self.home_slider_four.get() > 0):
+            send_ingredients.append(State.inventory["slot_four"], self.home_slider_four.get())
+        send_recipe = Recipe("Outgoing Drink", send_ingredients)
         print("DRINK UP BABY")
 
 
