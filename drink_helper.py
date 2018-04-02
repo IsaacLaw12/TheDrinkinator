@@ -68,12 +68,12 @@ class Recipe:
             print_string += "    " + ingr + " - " + str(self.ingredients[ingr]) + "\n"
         return print_string
 
-
 class State:
     '''
-    A class to hold the current state of the program.  This class is static
-    and not intended to be instantiated.  Reference attributes and methods
-    using state.foo or state.bar()
+    USAGE:  State is a static class that does not need to be instantiated.
+    Before using any variables or methods you should call State.load_state()
+    to make sure that the state that was saved to the disk is loaded into
+    the current program.  Then call static methods with State.function()
     '''
     saved_state_fn = "state.pkl"
     

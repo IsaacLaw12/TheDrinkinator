@@ -1,16 +1,17 @@
+
 import time
 import sys
 import json
 from keychain import keychain
 from drink_helper import Recipe, State
-
-sys.path.insert(0, './python/')
+# Use this to properly import pubnub if the python directory is in the same folder
+# If pubnub was properly installed through pip then ignore this line
+# sys.path.insert(0, './python/')
 
 from pubnub.callbacks import SubscribeCallback
 from pubnub.enums import PNStatusCategory
 from pubnub.pnconfiguration import PNConfiguration
 from pubnub.pubnub import PubNub
-
 
 pnconfig = PNConfiguration()
 
@@ -20,9 +21,6 @@ pnconfig.subscribe_key = keychain["pn_subscribe_key"]
 pnconfig.publish_key = keychain["pn_publish_key"]
 
 serverChannel = "TestChannel"
-# Change to client or server depending on deployment location
-
-
 
 class Message_Handler():
     
@@ -53,6 +51,7 @@ class Message_Handler():
             
         json_content = json.dumps(jsonable_obj)
         self.pubnub.publish().channel(serverChannel).message({'sender': Message_Handler.local_id, 'id': receiver, 'request_type':request_type, 'data': json_content}).async(self.DrinkMachinePublishCallback)
+
 
     def DrinkMachinePublishCallback(self, envelope, status):
         if not status.is_error():
