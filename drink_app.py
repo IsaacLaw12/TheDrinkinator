@@ -3,10 +3,11 @@ from tkinter import ttk
 from tkinter import *
 import tkinter as tk
 from drink_helper import State, Recipe
+from pubnum_interface import Message_Handler
 
 class DrinkApp():
-    def __init__(self): #self, *args, **kwargs
-        #tk.Tk.__init__(self, *args, **kwargs)
+    def __init__(self):
+        self.message_handler = Message_Handler("client", "server")
         # Setup main window
         self.root = tk.Tk()
         self.root.title("The Drinkinator")
@@ -365,6 +366,7 @@ class DrinkApp():
             State.set_inventory(slot, None)
         else:
             State.set_inventory(slot, name)
+        self.message_handler.fireMessage(request_type="set_inventory", receiver='server', jsonable_obj=State.inventory)
         self.full_update()
     def set_recipe_ingredient(self, dropdown, name):
         dropdown.set(name)
@@ -398,11 +400,12 @@ class DrinkApp():
         if (State.inventory["slot_four"] != None) and (self.home_slider_four.get() > 0):
             send_ingredients.append((State.inventory["slot_four"], self.home_slider_four.get()))
         send_recipe = Recipe("Outgoing Drink", send_ingredients)
-        print("DRINK UP BABY")
+        self.message_handler.fireMessage(request_type="make_drink", receiver="server", jsonable_obj=send_recipe.recipe_dict())
     def add_ingredient(self):
         print("Added drink ingredient")
         print(self.setting_new_drink_frame_ingredient.get())
         State.add_ingredient(self.setting_new_drink_frame_ingredient.get())
+        self.message_handler.fireMessage(request_type="add_ingredients",receiver='server',jsonable_obj=State.ingredients)
         self.full_update()
     def save_new_drink(self):
         print("Saved new Drink")
@@ -422,6 +425,8 @@ class DrinkApp():
             options.append((key,value))
         newRecipe = Recipe(name, options)
         State.add_recipe(newRecipe)
+        jsonable_recipes = [recipe.dict_obj() for name, recipe in State.recipes.items()]
+        self.message_handler.fireMessage(request_type="add_recipes", receiver='server', jsonable_obj=jsonable_recipes)
         self.full_update()
         
 if __name__== "__main__":
