@@ -9,13 +9,18 @@ import pickle
 import json
 from drink_helper import State, Recipe
 
+SECONDS_PER_TIME_UNIT = 10
+
 
 class Drink_Server:
     def __init__(self):
         # Should load saved settings which are stored in the static State class
         State.load_state()
-        
+        self.DP = DrinkPump()
+        # Start listener for drinks being sent to the pump
+        self.DP.start()
         self.message_handle = Message_Handler(localId='server', intendedReceiver='client')
+        # Listen for requests and button inputs
         self.run()
 
     def run(self):
@@ -42,30 +47,47 @@ class Drink_Server:
         
         # Getter methods that return the current State values to the requester
         if request_type == "get_inventory":
+            # Returns a JSON object of the slot information in the inventory dictionary
             self.message_handle.fireMessage(request_type="set_inventory",receiver=request_sender, jsonable_obj=State.inventory)
             
         elif request_type == "get_ingredients":
+            # Returns a JSON object of the ingredients list
             self.message_handle.fireMessage(request_type="set_ingredients",receiver=request_sender, jsonable_obj=State.ingredients)
             
         elif request_type == "get_recipes":
+            # Returns a JSON object of the recipes list
+            # The recipe class is first converted into a dictionary
             jsonable_recipes = [recipe.dict_obj() for name, recipe in State.recipes.items()]
             self.message_handle.fireMessage(request_type="set_recipes", receiver=request_sender, jsonable_obj=jsonable_recipes)
         
         elif request_type == "make_drink":
-            pass
+            # request_data should contain a recipe_dict object
+            send_drink_signals(request_data)
         # These should be the setter methods such as set_ingredients, set_inventory, set_recipes
         else:
             State.process_request(request_type, request_data)
         
         
-        
-        if request_type == "make_drink":
-            pass
-        
-    def send_request(request_type, receiver, data_object):
+    def send_request(self, request_type, receiver, data_object):
         self.message_handle.fireMessage(request_type=request_type, receiver=receiver, jsonable_obj=data_object)
-    def send_drink_signals():
-        pass
+        
+    def send_drink_signals(self, recipe_obj):
+        '''
+        recipe_obj: Should be a dictionary produced from a Recipe with the recipe_dict method.
+        The ingredient names will be converted to slot names based off of the current State.inventory
+        settings.  The time units will be multiplied by their conversion constant.  The finished
+        dictionary will be added to the drink pump queue where it will be processed when the pumps
+        are free.
+        '''
+        print("Making drink: " + recipe_obj['recipe_name'])
+        # Converted should have format "slot_name" : pump time in seconds when done
+        converted = {}
+        # Iterate through ingredients and convert ingredient name to slot name
+        for slot, ingredient in State.inventory.items():
+            if ingredient in recipe_obj:
+                converted[slot] = recipe_obj[ingredient] * SECONDS_PER_TIME_UNIT
+        self.DP.pump_queue.append(converted)
+             
     def populate_lcd_screen():
         pass
     def receive_lcd_inputs():
