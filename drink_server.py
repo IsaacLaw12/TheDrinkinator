@@ -16,15 +16,23 @@ class Drink_Server:
     def __init__(self):
         # Should load saved settings which are stored in the static State class
         State.load_state()
-        self.DP = DrinkPump()
         # Start listener for drinks being sent to the pump
+        self.DP = DrinkPump()
         self.DP.start()
+        
         self.message_handle = Message_Handler(localId='server', intendedReceiver='client')
+        # Start listener for lcd requests
+        self.LD = DriveLCD()
+        self.LD.start()
         # Listen for requests and button inputs
         self.run()
 
     def run(self):
         # Continually check to see if a request has been received, then process it.
+        print("server running")
+        print("State ingredients are " + str(State.ingredients))
+        print("State recipes are " + str(State.recipes))
+        print("State inventory is " + str(State.inventory))
         while (True):
             if self.message_handle.message_queue:
                 # Loop through the received messages and process each one
@@ -32,10 +40,11 @@ class Drink_Server:
                     self.process_request(self.message_handle.message_queue.pop(0))
             
         # TODO READ INPUT FROM RASPBERRY PI
-            print("server running")
-            print("State ingredients are " + str(State.ingredients))
-            print("State recipes are " + str(State.recipes))
-            print("State inventory is " + str(State.inventory))
+            if self.LD.make_drink_queue:
+                # Remove the recipe dict and send it 
+                drink_obj = self.LD.make_drink_queue.pop(0)
+                send_drink_signals(drink_obj)
+                
             time.sleep(3)
 
     def process_request(self, data):
