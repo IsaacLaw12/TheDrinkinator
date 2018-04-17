@@ -1,16 +1,36 @@
 # TheDrinkinator
+Status: 
+GUI has all the necessary elements, functionality is in the process of being added.
+Drink related requests can successfully be sent between different computers over pubnub.
+State can be loaded and saved to a pickle file.  Recipes can be added, edited, and deleted.
+Slot inventory can be set and cleared.  Ingredients can be added and deleted.
 
-Current status of drink_client.py:
-GUI is barely there. The only useful functionality is that there are two tabs which 
-contain frames.  These frames are where the two different windows need to be built.
- An important thing we need to figure out is what layout manager to use.
-All of the commands that use .pack() refer to the pack layout manager, but it is very limited.
-Elements can't be positioned around the screen at all, they just fill it up. 
+# Install Dependencies
+ Easy way:
+ The Pubnub API can be installed with pip install 'pubnub>=4.0.13'
+ Pubnub can then just be imported into pubnub_interface.py like the default.
 
-Maybe look into the grid layout manager to help line up elements, or any other layout
-manager that looks like it might work.  I'm pretty sure you can only use one layout 
-manager at a time though. So if you're working with grid make sure that all the .pack()
-commands are gone. 
+ Harder way:
+ The Pubnub API can be downloaded with git clone https://github.com/pubnub/python
+ The directory where it is downloaded to then has to be pointed to by the sys.path.insert
+ line that is commented out at the top of pubnub_interface.py.
 
-Also it would be good to figure out how frames work. They're like boxes to store screen 
-elements on, and it might be helpful to have several different frames in the window.
+# Install Client
+ On the computer that should run the client open up keychain_dist.py.  Add your pubnub keys
+ to the file.  Close it and rename the file to keychain.py.  If the default computer name
+ of "client" works for you then run the GUI with python3 drink_app.py.
+ The computer name can be changed by opening up drink_app.py and changing the name where
+ Message_Handler is instantiated.
+ 
+# Install Server
+ Server has been tested on a Raspberry Pi.  The setup was to have four relays controlled by 
+ GPIO pins: (FILE THIS IN). These relays each control a peristaltic pump for dispensing liquids.
+ If you are controlling your relay from different GPIO pins then make sure to open up drink_server.py
+ and change the GPIO pins that are used by default.  The tested setup also had a 16x2 lcd display
+ with button controls.  
+ The tested screen can be found here: https://www.adafruit.com/product/1115?gclid=EAIaIQobChMI57C9tbGa2gIVVp7ACh0y1ACFEAYYASABEgIOrfD_BwE
+ This screen is not necessary for running the server, but it provides a way to start drinks directly
+  from the Raspberry Pi.
+ On the computer that should run the server open up keychain_dist.py.  Add your pubnub keys
+ to the file.  Close it and rename the file to keychain.py.  If the default computer name
+ of "server" works for you then run the server with python3 drink_server.py

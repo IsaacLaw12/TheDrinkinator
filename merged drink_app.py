@@ -1,12 +1,12 @@
+
 from tkinter import ttk
 from tkinter import *
 import tkinter as tk
 from drink_helper import State, Recipe
-from pubnub_interface import Message_Handler
 
 class DrinkApp():
-    def __init__(self):
-        self.message_handler = Message_Handler("client", "server")
+    def __init__(self): #self, *args, **kwargs
+        #tk.Tk.__init__(self, *args, **kwargs)
         # Setup main window
         self.root = tk.Tk()
         self.root.title("The Drinkinator")
@@ -180,51 +180,54 @@ class DrinkApp():
 
         
         # Setup drink 1 sliders
-        self.settings_slider_one = Scale(self.settings_drink_slider_frame, bg = "white", from_=0, to=10, orient=HORIZONTAL)
+        self.settings_slider_one = Scale(self.settings_drink_slider_frame, bg = "white", from_=0, to=100, orient=HORIZONTAL)
         self.settings_slider_one.grid(row = 1, pady = 3, sticky = "nsew",  padx = 3,  column = 1, columnspan = 2)
         
         # Setup drink 1 select
-        self.settings_drink_selected_one = tk.StringVar(self.settings_drink_slider_frame)
-        self.settings_drink_selected_one.set("Empty Slot")
-        self.settings_drink_select_one = tk.OptionMenu(self.settings_drink_slider_frame, self.settings_drink_selected_one, "Empty Slot")
-        self.settings_drink_select_one.config(bg = "white", bd = 0)
-        self.settings_drink_select_one.grid(row = 1, column = 0,  pady = 3, padx = 3, sticky = "nsew")
+        self.settings_drink_options = ["Slot ...", "some good drinks here", "this one looks pretty good huh?", "nice"]
+        self.settings_drink_selected = tk.StringVar(self.settings_drink_slider_frame)
+        self.settings_drink_selected.set(self.settings_drink_options[0])
+        self.settings_drink_select1 = tk.OptionMenu(self.settings_drink_slider_frame, self.settings_drink_selected, *self.settings_drink_options)
+        self.settings_drink_select1.config(bg = "white", bd = 0)
+        self.settings_drink_select1.grid(row = 1, column = 0,  pady = 3, padx = 3, sticky = "nsew")
         
         # Setup drink 2 slider 
-        self.settings_slider_two = Scale(self.settings_drink_slider_frame, bg = "white", from_=0, to=10, orient=HORIZONTAL)
+        self.settings_slider_two = Scale(self.settings_drink_slider_frame, bg = "white", from_=0, to=100, orient=HORIZONTAL)
         self.settings_slider_two.grid(row = 2, pady = 3, padx = 3, sticky = "nsew",  column = 1, columnspan = 2)
         
         # Setup drink 2 select
-        self.settings_drink_selected_two = tk.StringVar(self.settings_drink_slider_frame)
-        self.settings_drink_selected_two.set("Empty Slot")
-        self.settings_drink_select_two = tk.OptionMenu(self.settings_drink_slider_frame, self.settings_drink_selected_two, "Empty Slot")
-        self.settings_drink_select_two.config(bg = "white", bd = 0)
-        self.settings_drink_select_two.grid(row = 2, pady = 3, column = 0,padx = 3, sticky = "nsew")
+        self.settings_drink_options = ["Slot ...", "some good drinks here", "this one looks pretty good huh?", "nice"]
+        self.settings_drink_selected = tk.StringVar(self.settings_drink_slider_frame)
+        self.settings_drink_selected.set(self.settings_drink_options[0])
+        self.settings_drink_select2 = tk.OptionMenu(self.settings_drink_slider_frame, self.settings_drink_selected, *self.settings_drink_options)
+        self.settings_drink_select2.config(bg = "white", bd = 0)
+        self.settings_drink_select2.grid(row = 2, pady = 3, column = 0,padx = 3, sticky = "nsew")
     
         
         # Setup drink 3 slider
-        self.settings_slider_three = Scale(self.settings_drink_slider_frame,  bg = "white", from_=0, to=10, orient=HORIZONTAL)
+        self.settings_slider_three = Scale(self.settings_drink_slider_frame,  bg = "white", from_=0, to=100, orient=HORIZONTAL)
         self.settings_slider_three.grid(row = 3, pady = 3,padx = 3, sticky = "nsew",  column = 1, columnspan = 2)
         
         # Setup drink 3 select
         self.settings_drink_options = ["Slot ...", "some good drinks here", "this one looks pretty good huh?", "nice"]
-        self.settings_drink_selected_three = tk.StringVar(self.settings_drink_slider_frame)
-        self.settings_drink_selected_three.set("Empty Slot")
-        self.settings_drink_select_three = tk.OptionMenu(self.settings_drink_slider_frame, self.settings_drink_selected_three, "Empty Slot")
-        self.settings_drink_select_three.config(bg = "white", bd = 0)
-        self.settings_drink_select_three.grid(row = 3, pady = 3, column = 0, padx = 3, sticky = "nsew")
+        self.settings_drink_selected = tk.StringVar(self.settings_drink_slider_frame)
+        self.settings_drink_selected.set(self.settings_drink_options[0])
+        self.settings_drink_select3 = tk.OptionMenu(self.settings_drink_slider_frame, self.settings_drink_selected, *self.settings_drink_options)
+        self.settings_drink_select3.config(bg = "white", bd = 0)
+        self.settings_drink_select3.grid(row = 3, pady = 3, column = 0, padx = 3, sticky = "nsew")
         
         
         # Setup drink4 slider
-        self.settings_slider_four = Scale(self.settings_drink_slider_frame,  bg = "white", from_=0, to=10, orient=HORIZONTAL)
+        self.settings_slider_four = Scale(self.settings_drink_slider_frame,  bg = "white", from_=0, to=100, orient=HORIZONTAL)
         self.settings_slider_four.grid(row = 4, pady = 3, padx = 3, sticky = "nsew", column = 1, columnspan = 2)
         
         # Setup drink4 select
-        self.settings_drink_selected_four = tk.StringVar(self.settings_drink_slider_frame)
-        self.settings_drink_selected_four.set("Empty Slot")
-        self.settings_drink_select_four = tk.OptionMenu(self.settings_drink_slider_frame, self.settings_drink_selected_four, "Empty Slot")
-        self.settings_drink_select_four.config(bg = "white", bd = 0)
-        self.settings_drink_select_four.grid(row = 4, pady = 3, column = 0, padx = 3, sticky = "nsew")
+        self.settings_drink_options = ["Slot ...", "some good drinks here", "this one looks pretty good huh?", "nice"]
+        self.settings_drink_selected = tk.StringVar(self.settings_drink_slider_frame)
+        self.settings_drink_selected.set(self.settings_drink_options[0])
+        self.settings_drink_select4 = tk.OptionMenu(self.settings_drink_slider_frame, self.settings_drink_selected, *self.settings_drink_options)
+        self.settings_drink_select4.config(bg = "white", bd = 0)
+        self.settings_drink_select4.grid(row = 4, pady = 3, column = 0, padx = 3, sticky = "nsew")
     
         
         
@@ -232,8 +235,9 @@ class DrinkApp():
         self.setting_new_drink_frame_drink = tk.Entry(self.settings_drink_slider_frame)
         self.setting_new_drink_frame_drink.grid(row=5, column=0, columnspan = 2, sticky = 'nsew')
         self.setting_new_drink_frame_drink.insert(0, "New Drink Name")
+        self.entry = self.setting_new_drink_frame_drink.get()
         
-        self.settings_save_button = tk.Button(self.settings_drink_slider_frame, bg = "white", fg = "black", text = "Save", command = self.save_new_drink)
+        self.settings_save_button = tk.Button(self.settings_drink_slider_frame, bg = "white", fg = "black", text = "Save", command = self.save_activated)
         self.settings_save_button.grid(row = 5, column = 2)
         
         
@@ -254,12 +258,13 @@ class DrinkApp():
         
         # Setup add drink
         
-        self.setting_new_drink_frame_ingredient = tk.Entry(self.settings_new_drink_frame)
-        self.setting_new_drink_frame_ingredient.grid(row=1, column=0, columnspan =3, sticky = "nswe")
-        self.setting_new_drink_frame_ingredient.insert(0, "new ingredient")
+        self.setting_new_drink_frame_drink = tk.Entry(self.settings_new_drink_frame)
+        self.setting_new_drink_frame_drink.grid(row=1, column=0, columnspan =3, sticky = "nswe")
+        self.setting_new_drink_frame_drink.insert(0, "new drink")
+        self.entry = self.setting_new_drink_frame_drink.get()
         
         
-        self.settings_add_button = tk.Button(self.settings_new_drink_frame, bg = "white", fg = "black", text = "Add", command = self.add_ingredient)
+        self.settings_add_button = tk.Button(self.settings_new_drink_frame, bg = "white", fg = "black", text = "Add", command = self.add_drink)
         self.settings_add_button.grid(row = 1, column = 3, columnspan = 1, sticky = "sne")
         
         
@@ -311,17 +316,16 @@ class DrinkApp():
             self.home_slider_four.config(label=State.inventory["slot_four"])
             self.home_slider_four.grid()
             avalible_ingrediants.append(State.inventory["slot_four"])
-            
         # Figure out which recipies are currently avalible
         self.home_drink_options = []
-        for recipe_name, recipe in State.recipes.items():
+        for recipe in State.recipes:
             avalible = True
-            for value in recipe.ingredients:
-                if (value != "recipe_name"):
+            for value in State.recipes[recipe].ingredients:
+                if (value != None):
                     if not (value in avalible_ingrediants):
                         avalible = False
             if (avalible == True):
-                self.home_drink_options.append(recipe.recipe_name)
+                self.home_drink_options.append(State.recipes[recipe].recipe_name);
         self.home_drink_selected.set("Select a drink")
         # Clear dropdown values
         self.home_drink_select["menu"].delete(0, 'end')
@@ -334,42 +338,11 @@ class DrinkApp():
         self.settings_ingredient_select_three["menu"].delete(0, 'end')
         self.settings_ingredient_select_four["menu"].delete(0, 'end')
         for ingredient in State.ingredients:
-            self.settings_ingredient_select_one["menu"].add_command(label=ingredient, command = lambda ingredient = ingredient: self.set_ingredient(self.settings_ingredient_selected_one, ingredient, "slot_one"))
-            self.settings_ingredient_select_two["menu"].add_command(label=ingredient, command = lambda ingredient = ingredient: self.set_ingredient(self.settings_ingredient_selected_two, ingredient, "slot_two"))
-            self.settings_ingredient_select_three["menu"].add_command(label=ingredient, command = lambda ingredient = ingredient: self.set_ingredient(self.settings_ingredient_selected_three, ingredient, "slot_three"))
-            self.settings_ingredient_select_four["menu"].add_command(label=ingredient, command = lambda ingredient = ingredient: self.set_ingredient(self.settings_ingredient_selected_four, ingredient, "slot_four"))
-        self.settings_ingredient_select_one["menu"].add_command(label="Empty Slot", command = lambda: self.set_ingredient(self.settings_ingredient_selected_one, "Empty Slot", "slot_one"))
-        self.settings_ingredient_select_two["menu"].add_command(label="Empty Slot", command = lambda: self.set_ingredient(self.settings_ingredient_selected_two, "Empty Slot", "slot_two"))
-        self.settings_ingredient_select_three["menu"].add_command(label="Empty Slot", command = lambda: self.set_ingredient(self.settings_ingredient_selected_three, "Empty Slot", "slot_three"))
-        self.settings_ingredient_select_four["menu"].add_command(label="Empty Slot", command = lambda: self.set_ingredient(self.settings_ingredient_selected_four, "Empty Slot", "slot_four"))
-        self.settings_ingredient_selected_one.set(State.inventory["slot_one"])
-        self.settings_ingredient_selected_two.set(State.inventory["slot_two"])
-        self.settings_ingredient_selected_three.set(State.inventory["slot_three"])
-        self.settings_ingredient_selected_four.set(State.inventory["slot_four"])
-        
-        self.settings_drink_select_one["menu"].delete(0, 'end')
-        self.settings_drink_select_two["menu"].delete(0, 'end')
-        self.settings_drink_select_three["menu"].delete(0, 'end')
-        self.settings_drink_select_four["menu"].delete(0, 'end')
-        for ingredient in State.ingredients:
-            self.settings_drink_select_one["menu"].add_command(label=ingredient, command = lambda ingredient = ingredient: self.set_recipe_ingredient(self.settings_drink_selected_one, ingredient))
-            self.settings_drink_select_two["menu"].add_command(label=ingredient, command = lambda ingredient = ingredient: self.set_recipe_ingredient(self.settings_drink_selected_two, ingredient))
-            self.settings_drink_select_three["menu"].add_command(label=ingredient, command = lambda ingredient = ingredient: self.set_recipe_ingredient(self.settings_drink_selected_three, ingredient))
-            self.settings_drink_select_four["menu"].add_command(label=ingredient, command = lambda ingredient = ingredient: self.set_recipe_ingredient(self.settings_drink_selected_four, ingredient))
-        self.settings_drink_select_one["menu"].add_command(label="Empty Slot", command = lambda: self.set_recipe_ingredient(self.settings_drink_selected_one, "Empty Slot"))
-        self.settings_drink_select_two["menu"].add_command(label="Empty Slot", command = lambda: self.set_recipe_ingredient(self.settings_drink_selected_two, "Empty Slot"))
-        self.settings_drink_select_three["menu"].add_command(label="Empty Slot", command = lambda: self.set_recipe_ingredient(self.settings_drink_selected_three, "Empty Slot"))
-        self.settings_drink_select_four["menu"].add_command(label="Empty Slot", command = lambda: self.set_recipe_ingredient(self.settings_drink_selected_four, "Empty Slot"))
-        print(State.to_string())
-    def set_ingredient(self, dropdown, name, slot):
-        dropdown.set(name)
-        if (name == "Empty Slot"):
-            State.set_inventory(slot, None)
-        else:
-            State.set_inventory(slot, name)
-        self.message_handler.fireMessage(request_type="set_inventory", receiver='server', jsonable_obj=State.inventory)
-        self.full_update()
-    def set_recipe_ingredient(self, dropdown, name):
+            self.settings_ingredient_select_one["menu"].add_command(label=ingredient, command = lambda ingredient = ingredient: self.set_ingredient(self.settings_ingredient_select_one, name))
+            self.settings_ingredient_select_two["menu"].add_command(label=ingredient, command = lambda ingredient = ingredient: self.set_ingredient(self.settings_ingredient_select_two, name))
+            self.settings_ingredient_select_three["menu"].add_command(label=ingredient, command = lambda ingredient = ingredient: self.set_ingredient(self.settings_ingredient_select_three, name))
+            self.settings_ingredient_select_four["menu"].add_command(label=ingredient, command = lambda ingredient = ingredient: self.set_ingredient(self.settings_ingredient_select_four, name))
+    def set_ingredient(self, dropdown, name):
         dropdown.set(name)
     def set_selection(self, value):
         # Update what the dropdown shows
@@ -401,36 +374,24 @@ class DrinkApp():
         if (State.inventory["slot_four"] != None) and (self.home_slider_four.get() > 0):
             send_ingredients.append((State.inventory["slot_four"], self.home_slider_four.get()))
         send_recipe = Recipe("Outgoing Drink", send_ingredients)
-        self.message_handler.fireMessage(request_type="make_drink", receiver="server", jsonable_obj=send_recipe.dict_obj())
-    def add_ingredient(self):
-        print("Added drink ingredient")
-        print(self.setting_new_drink_frame_ingredient.get())
-        State.add_ingredient(self.setting_new_drink_frame_ingredient.get())
-        self.message_handler.fireMessage(request_type="add_ingredients",receiver='server',jsonable_obj=State.ingredients)
-        self.full_update()
-    def save_new_drink(self):
-        print("Saved new Drink")
-        name = self.setting_new_drink_frame_drink.get()
-        print(name)
-        ingredient_amounts = {}
-        if (self.settings_drink_selected_one.get() != "Empty Slot") and (self.settings_slider_one.get() > 0):
-            ingredient_amounts[self.settings_drink_selected_one.get()] = self.settings_slider_one.get()
-        if (self.settings_drink_selected_two.get() != "Empty Slot") and (self.settings_slider_two.get() > 0):
-            ingredient_amounts[self.settings_drink_selected_two.get()] = self.settings_slider_two.get()
-        if (self.settings_drink_selected_three.get() != "Empty Slot") and (self.settings_slider_three.get() > 0):
-            ingredient_amounts[self.settings_drink_selected_three.get()] = self.settings_slider_three.get()
-        if (self.settings_drink_selected_four.get() != "Empty Slot") and (self.settings_slider_four.get() > 0):
-            ingredient_amounts[self.settings_drink_selected_four.get()] = self.settings_slider_four.get()
-        options = []
-        for key, value in ingredient_amounts.items():
-            options.append((key,value))
-        newRecipe = Recipe(name, options)
-        State.add_recipe(newRecipe)
-        jsonable_recipes = [recipe.dict_obj() for name, recipe in State.recipes.items()]
-        self.message_handler.fireMessage(request_type="add_recipes", receiver='server', jsonable_obj=jsonable_recipes)
-        self.full_update()
-        
-if __name__== "__main__":
-    State.load_state()
-    app = DrinkApp()
+        print("DRINK UP BABY")
+    def add_drink(self):
+        print("Drink added")
+    def save_activated(self):
+        print("DRINK UP BABY")
 
+if __name__== "__main__":
+    #Test code
+    State.ingredients.append("Vodka")
+    State.ingredients.append("Lemon Juice")
+    State.ingredients.append("Sprite")
+    State.ingredients.append("Gin")
+    State.inventory["slot_one"] = "Vodka"
+    State.inventory["slot_two"] = "Lemon Juice"
+    State.inventory["slot_three"] = "Sprite"
+    State.inventory["slot_four"] = "Gin"
+    State.recipes["Bad Gin"] = Recipe("Bad Gin", [("Gin", 1),("Lemon Juice", 8)])
+    State.recipes["Just Sprite"] = Recipe("Just Sprite", [("Sprite", 10),("Lemon Juice", 1)])
+    State.recipes["Suicide"] = Recipe("Suicide", [("Gin", 5),("Vodka", 5),("Sprite", 5),("Lemon Juice", 5)])
+    #End test code
+    app = DrinkApp()
