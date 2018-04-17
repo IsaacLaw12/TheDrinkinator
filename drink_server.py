@@ -8,6 +8,7 @@ import time
 import pickle
 import json
 from drink_helper import State, Recipe
+from pump_driver import DrivePump
 
 SECONDS_PER_TIME_UNIT = 10
 
@@ -17,13 +18,13 @@ class Drink_Server:
         # Should load saved settings which are stored in the static State class
         State.load_state()
         # Start listener for drinks being sent to the pump
-        self.DP = DrinkPump()
+        self.DP = DrivePump()
         self.DP.start()
         
         self.message_handle = Message_Handler(localId='server', intendedReceiver='client')
         # Start listener for lcd requests
-        self.LD = DriveLCD()
-        self.LD.start()
+        #self.LD = DriveLCD()
+        #self.LD.start()
         # Listen for requests and button inputs
         self.run()
 
@@ -40,10 +41,10 @@ class Drink_Server:
                     self.process_request(self.message_handle.message_queue.pop(0))
             
         # TODO READ INPUT FROM RASPBERRY PI
-            if self.LD.make_drink_queue:
+            #if self.LD.make_drink_queue:
                 # Remove the recipe dict and send it 
-                drink_obj = self.LD.make_drink_queue.pop(0)
-                send_drink_signals(drink_obj)
+                #drink_obj = self.LD.make_drink_queue.pop(0)
+                #send_drink_signals(drink_obj)
                 
             time.sleep(3)
 
@@ -52,7 +53,9 @@ class Drink_Server:
         request_sender = data[0]  # Sender is first element of tuple
         request_type = data[1]  # Request_type is second element of tuple
         request_data = data[2]  # Data is third element of tuple, should already be json decoded
-        
+        print("received " + str(request_type))
+        print("from " + str(request_sender))
+        print("data " + str(request_data))
         
         # Getter methods that return the current State values to the requester
         if request_type == "get_inventory":
@@ -71,7 +74,7 @@ class Drink_Server:
         
         elif request_type == "make_drink":
             # request_data should contain a recipe_dict object
-            send_drink_signals(request_data)
+            self.send_drink_signals(request_data)
         # These should be the setter methods such as set_ingredients, set_inventory, set_recipes
         else:
             State.process_request(request_type, request_data)
