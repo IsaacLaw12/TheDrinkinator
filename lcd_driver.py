@@ -2,8 +2,11 @@
 Directly connects to the pump relays in PUMP_SETTINGS make sure to have the correct
 BCM number of the GPIO pins attached to the relay that control the pump.
 '''
+from drink_helper import *
 import threading
 import time
+import sys
+sys.path.insert(0, '../Adafruit/Adafruit_Python_CharLCD')
 import Adafruit_CharLCD as LCD
 
 # Initialize the LCD using the pins
@@ -25,38 +28,46 @@ class DriveLCD(threading.Thread):
         buttons = (LCD.SELECT, LCD.UP, LCD.DOWN)
         # Used to keep track of where the user is in the menu
         menu_index = 0 
+        write_new = True
+        time_of_last_send = time.time()
         while True:
-            # This file should be only called from drink_server.py, that's where State is declared
-            inventory = State.inventory
+            inventory = [ingredient for slot_name, ingredient in State.inventory.items()]
+            #print("inventory is " + str(inventory))
             recipes = State.recipes
             avail_recipes = [] # A list of recipe objects
-            display_lines = ["Available drinks:"]
+            display_lines = ["Avail drinks:"]
             
             # Add available recipes to avail_recipes for selection
-            for recipe in recipes:
+            for name,recipe in recipes.items():
                 possible = True
                 for ingredient in recipe.ingredients:
+                    if ingredient == "recipe_name":
+                        continue
                     # If inventory doesn't contain all of the necessary ingredients don't add
                     if ingredient not in inventory:
+                        #print(name + " not possible because " + ingredient + " is missing")
                         possible = False
                 if possible:
-                    avail_recipes.append(recipe)
+                    avail_recipes.append(recipe.dict_obj())
             
             if not avail_recipes:
                 display_lines = ["No drinks avail"]
             else:
-                for recipe in avail_recipes:
-                    display_lines.append(recipe.recipe_name)
-            
+                for avail_rec in avail_recipes:
+                    display_lines.append(avail_rec["recipe_name"])
             #
             # Detect button inputs
             # Handle selection of recipe
             if lcd.is_pressed(LCD.SELECT):
-                if index != 0 and index < len(display_lines):
-                    # Shift the index down one to compensate for "Availible drinks" offset
-                    converted_index = index -1
+                if (time.time() - time_of_last_send) < 10:
+                    pass
+                if menu_index != 0 and menu_index < len(display_lines):
+                    # Shift the menu_index down one to compensate for "Availible drinks" offset
+                    converted_index = menu_index -1
                     selected_recipe = avail_recipes[converted_index]
-                    make_drink_queue.append(selected_recipe.dict_obj)
+                    self.make_drink_queue.append(selected_recipe)
+                    time_of_last_send = time.time()
+                    print(self.make_drink_queue)
             
             # Toggle blink with the right arrow
             if lcd.is_pressed(LCD.RIGHT):
@@ -65,27 +76,22 @@ class DriveLCD(threading.Thread):
                 
             # Handle up and down scrolling of menu
             if lcd.is_pressed(LCD.UP):
-                if index > 0:
-                    index += 1
+                if menu_index > 0:
+                    write_new = True
+                    menu_index -= 1
             if lcd.is_pressed(LCD.DOWN):
-                if index < len(display_lines):
-                    index -= 1
+                if menu_index < (len(display_lines)-1):
+                    write_new = True
+                    menu_index += 1
             #
             # Print menu to display
-            lcd.clear()
-            message = display_lines[index]
-            # If there is a line below, display that too
-            if (index + 1) < len(display_lines):
-                message += "\n" + display_lines[index+1]
-            lcd.message(display_lines[index])            
-            
-
-if __name__ == "__main__":
-    #pd = PumpThread('slot_one', 3)
-    #pd.start()
-    DP = DrivePump()
-    DP.start()
-    time.sleep(1)
-    DrivePump.pump_queue.append({"slot_one": 3})
-    time.sleep(3)
-    DrivePump.pump_queue.append({"slot_one": 2})
+            if write_new:
+                lcd.clear()
+                message = display_lines[menu_index]
+                # If there is a line below, display that too
+                if (menu_index + 1) < len(display_lines):
+                    message += "\n" + display_lines[menu_index+1]
+                lcd.message(message)
+                write_new = False
+            time.sleep(.2)
+    

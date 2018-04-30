@@ -9,9 +9,9 @@ GPIO.setmode(GPIO.BCM)
 
 PUMP_SETTINGS =  {
     "slot_one" : 17,
-    "slot_two" : -1,
-    "slot_three": -1,
-    "slot_four": -1,    
+    "slot_two" : 27,
+    "slot_three": 22,
+    "slot_four": 23,    
     }
 
 class DrivePump(threading.Thread):
@@ -24,12 +24,17 @@ class DrivePump(threading.Thread):
     
     def __init__(self):
         threading.Thread.__init__(self)
+        # Turn off all the relays
+        for slot_name, pin in PUMP_SETTINGS.items():
+            GPIO.setup(pin, GPIO.LOW)
+            GPIO.setup(pin, GPIO.HIGH)
 
     def run(self):
         while True:
             # Continually check for pour requests
             if DrivePump.pump_queue:
                 current_pour = DrivePump.pump_queue.pop(0)
+                print("CURRENT POUR " + str(current_pour))
                 time_to_complete = 0
                 # Iterate through slot names and times, start a thread to control the pour
                 for slot_name, pour_time in current_pour.items():
@@ -39,7 +44,7 @@ class DrivePump(threading.Thread):
                 # Give pumps time to finish pour
                 time.sleep(time_to_complete)
             # Pause to allow new requests to come in / pours to finish
-            time.sleep(5)
+            time.sleep(.1)
                     
 
 class PumpThread(threading.Thread):
