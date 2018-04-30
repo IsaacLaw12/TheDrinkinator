@@ -41,13 +41,13 @@ class Drink_Server:
                 while self.message_handle.message_queue:
                     self.process_request(self.message_handle.message_queue.pop(0))
             
-        # TODO READ INPUT FROM RASPBERRY PI
+        
             if self.LD.make_drink_queue:
                 # Remove the recipe dict and send it 
                 drink_obj = self.LD.make_drink_queue.pop(0)
                 self.send_drink_signals(drink_obj)
                 
-            time.sleep(3)
+            time.sleep(.1)
 
     def process_request(self, data):
         
@@ -100,6 +100,7 @@ class Drink_Server:
             if ingredient in recipe_obj:
                 converted[slot] = recipe_obj[ingredient] * SECONDS_PER_TIME_UNIT
         self.DP.pump_queue.append(converted)
+        print("Pump queue " + str(self.DP.pump_queue))
              
     def populate_lcd_screen():
         pass
@@ -107,4 +108,5 @@ class Drink_Server:
         pass
 
 if __name__ == "__main__":
+    time.sleep(15)
     server_instance = Drink_Server()
